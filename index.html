@@ -596,7 +596,7 @@ h1 em { color: var(--gold); font-style: normal; }
   <!-- Step 3: Client type -->
   <div class="card">
     <div class="card-label">STEP 03</div>
-    <div class="card-title"><span class="step-num">3</span>客戶類型</div>
+    <div class="card-title"><span class="step-num">3</span>超時費</div>
     <div class="service-row" style="grid-template-columns:1fr 1fr 1fr;">
       <div class="service-card active" id="client-regular" onclick="selectClientType('regular')">
         <div class="service-title">👤 一般客戶</div>
@@ -635,28 +635,7 @@ h1 em { color: var(--gold); font-style: normal; }
     <div class="duration-hint" id="overtime-hint"></div>
   </div>
 
-  <!-- Step 6: Urgent fee -->
-  <div class="card">
-    <div class="card-label">STEP 05</div>
-    <div class="card-title"><span class="step-num">5</span>加急費</div>
-    <div style="font-size:12px; color:var(--mid); margin-bottom:12px; font-family:'Space Mono',monospace;" id="urgent-rule-hint">
-      完整製作：10天內交件才計加急；純後製：7天內交件才計加急
-    </div>
-    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-      <div style="display:flex; flex-direction:column; gap:4px;">
-        <label style="font-size:11px; color:var(--mid); letter-spacing:0.5px;">交件天數</label>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <input class="duration-input" type="number" id="delivery-days" value="" min="1" placeholder="—"
-            style="width:80px; font-size:20px;"
-            oninput="calculate()" />
-          <span style="font-size:13px; color:var(--mid);">天</span>
-        </div>
-      </div>
-      <div class="duration-hint" id="urgent-hint" style="margin-top:0; align-self:flex-end; padding-bottom:10px;"></div>
-    </div>
-  </div>
-
-  <!-- Step 7: Extra add-ons -->
+  <!-- Step 6: Extra add-ons -->
   <div class="card">
     <div class="card-label">STEP 06</div>
     <div class="card-title"><span class="step-num">6</span>額外加價</div>
@@ -730,6 +709,14 @@ h1 em { color: var(--gold); font-style: normal; }
     <div class="card-label">時程安排</div>
     <div class="card-title"><span class="step-num">📅</span>製作時程</div>
     <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <label style="font-size:12px; color:var(--mid); width:110px; flex-shrink:0; font-weight:600; color:var(--ink);">拿到檔案日期</label>
+        <input type="date" id="sched-receive" onchange="calculate()"
+          style="font-size:13px; font-family:'Space Mono',monospace; padding:6px 10px; flex:1; min-width:140px; border-color:var(--gold);" />
+      </div>
+      <div id="urgent-auto-hint" style="display:none; font-size:12px; font-family:'Space Mono',monospace; color:var(--red); padding:6px 10px; background:rgba(212,138,0,0.08); border-radius:6px; border:1px solid var(--line);"></div>
+      <div style="height:2px; background:var(--line); border-radius:2px; margin:2px 0;"></div>
+      <div id="urgent-hint" style="display:none; font-size:12px; font-family:'Space Mono',monospace; padding:8px 12px; border-radius:6px; border:1px solid var(--line);"></div>
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
         <label style="font-size:12px; color:var(--mid); width:110px; flex-shrink:0;">初剪交期</label>
         <input type="date" id="sched-draft" onchange="calculate()"
@@ -1002,20 +989,38 @@ function calculate() {
   }
 
   // Urgent fee
-  const deliveryVal = document.getElementById('delivery-days').value;
-  const deliveryDays = deliveryVal !== '' ? parseFloat(deliveryVal) : null;
+  // Auto-calc urgent fee from 拿到檔案 → V1 交期
+  const receiveVal = document.getElementById('sched-receive').value;
+  const v1Val = document.getElementById('sched-v1').value;
   const urgentThreshold = state.type === 'post' ? 7 : 10;
   let urgentFee = 0;
+  let deliveryDays = null;
+  const autoHint = document.getElementById('urgent-auto-hint');
   const urgentHint = document.getElementById('urgent-hint');
-  if (deliveryDays !== null && deliveryDays > 0 && state.type) {
+  if (receiveVal && v1Val) {
+    const receiveDate = new Date(receiveVal);
+    const v1Date = new Date(v1Val);
+    deliveryDays = Math.round((v1Date - receiveDate) / (1000 * 60 * 60 * 24));
     const shortage = urgentThreshold - deliveryDays;
     if (shortage > 0) {
       urgentFee = shortage * URGENT_RATE;
-      urgentHint.innerHTML = '<span>少 ' + shortage + ' 天 × $' + URGENT_RATE.toLocaleString() + ' = +$' + urgentFee.toLocaleString() + '</span>';
+      autoHint.style.display = 'none';
+      autoHint.innerHTML = '⚡ 工作天 ' + deliveryDays + ' 天，少 ' + shortage + ' 天 → 加急費 +$' + urgentFee.toLocaleString();
+      urgentHint.style.display = 'block';
+      urgentHint.style.background = 'rgba(212,138,0,0.08)';
+      urgentHint.style.color = 'var(--red)';
+      urgentHint.innerHTML = '⚡ 工作天 ' + deliveryDays + ' 天，少 ' + shortage + ' 天 → 加急費 +$' + urgentFee.toLocaleString();
     } else {
-      urgentHint.innerHTML = '無加急費';
+      autoHint.style.display = 'none';
+      autoHint.innerHTML = '✓ 工作天 ' + deliveryDays + ' 天，無加急費';
+      urgentHint.style.display = 'block';
+      urgentHint.style.background = 'rgba(100,180,100,0.08)';
+      urgentHint.style.color = '#2d7a4f';
+      urgentHint.innerHTML = '✓ 工作天 ' + deliveryDays + ' 天，無加急費';
     }
   } else {
+    autoHint.style.display = 'none';
+    urgentHint.style.display = 'none';
     urgentHint.innerHTML = '';
   }
 
@@ -1071,8 +1076,8 @@ function calculate() {
   if (deliveryDays !== null) quote += '交件天數：' + deliveryDays + ' 天\n';
   quote += '費用明細：\n';
   quote += '・' + plan.name + '（' + (state.type==='full'?'完整製作':'純後製') + '）：' + fmt(base) + '\n';
-  if (overtime > 0) quote += '・超時加收：+' + fmt(overtime) + '\n';
-  if (urgentFee > 0) quote += '・加急費：+' + fmt(urgentFee) + '\n';
+  if (overtime > 0) quote += '・超時加收（多 ' + (dur - 10) + ' 分鐘）：+' + fmt(overtime) + '\n';
+  if (urgentFee > 0) quote += '・加急費（工作天 ' + deliveryDays + ' 天）：+' + fmt(urgentFee) + '\n';
   if (adInline) quote += '・工商置入：+' + fmt(AD_INLINE) + '\n';
   if (adMid) quote += '・獨立中插工商：+' + fmt(AD_MID) + '\n';
   if (footageFee) quote += '・毛片超量：+' + fmt(footageFee) + '\n';
@@ -1083,6 +1088,7 @@ function calculate() {
   });
   // Schedule
   const schedFields = [
+    ['sched-receive','拿到檔案日期'],
     ['sched-draft','初剪交期'], ['sched-draft-fb','初剪回饋修改'],
     ['sched-v1','V1 交期'], ['sched-v1-fb','V1 回饋修改'],
     ['sched-v2','V2 交期'], ['sched-v2-fb','V2 回饋修改'],
