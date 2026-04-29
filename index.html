@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>小玩剪輯報價計算機</title>
+<title>💰 小玩剪輯報價計算機</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -595,14 +595,14 @@ h1 em { color: var(--gold); font-style: normal; }
   <!-- Step 3: Client type -->
   <div class="card">
     <div class="card-label">STEP 03</div>
-    <div class="card-title"><span class="step-num">3</span>超時計費</div>
+    <div class="card-title"><span class="step-num">3</span>客戶類型</div>
     <div class="service-row" style="grid-template-columns:1fr 1fr 1fr;">
       <div class="service-card active" id="client-regular" onclick="selectClientType('regular')">
         <div class="service-title">👤 一般客戶</div>
         <div class="service-desc">超時費 $850 / 分鐘</div>
       </div>
       <div class="service-card" id="client-loyal" onclick="selectClientType('loyal')">
-        <div class="service-title">⭐ 長期客</div>
+        <div class="service-title">⭐ 熟客</div>
         <div class="service-desc">超時費 $800 / 分鐘</div>
       </div>
       <div class="service-card" id="client-custom" onclick="selectClientType('custom')">
@@ -1089,7 +1089,9 @@ function calculate() {
   ];
   const schedLines = schedFields.map(([id, label]) => {
     const val = document.getElementById(id).value;
-    return val ? label + '：' + val : null;
+    if (!val) return null;
+    const parts = val.split('-');
+    return label + '：' + parseInt(parts[1]) + '/' + parseInt(parts[2]);
   }).filter(Boolean);
   quote += '\n總計：' + fmt(total);
 
