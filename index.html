@@ -264,7 +264,7 @@ input::placeholder { color: var(--text-dim); }
 .breakdown-row .amt { font-family: 'Space Mono', monospace; }
 .breakdown-row .amt.plus { color: var(--accent); }
 .total-line {
-  display: flex; justify-content: space-between; align-items: baseline;
+  display: flex; justify-content: flex-end; align-items: baseline;
   padding: 14px 16px; border-top: 1px solid var(--border2);
   background: rgba(196,151,138,0.18);
   margin: 0 -28px -28px;
@@ -375,7 +375,7 @@ input::placeholder { color: var(--text-dim); }
         </div>
         <div class="plan-type-row" id="types-A">
           <div class="type-btn" id="type-A-full" onclick="selectPlanType('A','full')">
-            <span class="tb-label">🎬 完整製作</span>
+            <span class="tb-label">🎬 完整剪輯</span>
             <span class="tb-price">NT$6,000</span>
           </div>
           <div class="type-btn" id="type-A-post" onclick="selectPlanType('A','post')">
@@ -396,7 +396,7 @@ input::placeholder { color: var(--text-dim); }
         </div>
         <div class="plan-type-row" id="types-B">
           <div class="type-btn" id="type-B-full" onclick="selectPlanType('B','full')">
-            <span class="tb-label">🎬 完整製作</span>
+            <span class="tb-label">🎬 完整剪輯</span>
             <span class="tb-price">NT$7,500</span>
           </div>
           <div class="type-btn" id="type-B-post" onclick="selectPlanType('B','post')">
@@ -417,12 +417,32 @@ input::placeholder { color: var(--text-dim); }
         </div>
         <div class="plan-type-row" id="types-C">
           <div class="type-btn" id="type-C-full" onclick="selectPlanType('C','full')">
-            <span class="tb-label">🎬 完整製作</span>
+            <span class="tb-label">🎬 完整剪輯</span>
             <span class="tb-price">NT$9,500</span>
           </div>
           <div class="type-btn" id="type-C-post" onclick="selectPlanType('C','post')">
             <span class="tb-label">✂️ 純後製</span>
             <span class="tb-price">NT$8,000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan D -->
+      <div class="plan-row" id="planrow-D">
+        <div class="plan-row-header" onclick="selectPlan('D')">
+          <div class="plan-row-left">
+            <span class="plan-letter-sm">D</span>
+            <span class="plan-row-name">Reels</span>
+          </div>
+          <span class="plan-row-hint">選擇後展開服務類型 ▾</span>
+        </div>
+        <div class="plan-type-row" id="types-D">
+          <div class="type-btn custom-input-btn selected" id="type-D-full" style="flex:none; width:100%;">
+            <span class="tb-label">💰 Reels 報價</span>
+            <input type="number" id="D-full-price" value="2500" min="0"
+              onclick="event.stopPropagation()"
+              oninput="updateDPrice(); calculate()"
+              style="width:120px; margin-top:6px; font-family:'Space Mono',monospace; font-size:18px; font-weight:700; background:transparent; border:none; border-bottom:1px solid var(--border2); color:var(--text); outline:none; padding:2px 0;" />
           </div>
         </div>
       </div>
@@ -438,16 +458,10 @@ input::placeholder { color: var(--text-dim); }
         </div>
         <div class="plan-type-row" id="types-custom">
           <div style="display:flex; flex-direction:column; gap:10px; width:100%; padding:4px 0;">
-            <div style="display:flex; flex-direction:column; gap:4px;">
-              <label style="font-size:11px; color:var(--mid); letter-spacing:0.5px;">方案名稱</label>
-              <input type="text" id="custom-plan-name" placeholder="例：婚禮紀錄方案"
-                onclick="event.stopPropagation()"
-                oninput="updateCustomPrice(); calculate()"
-                style="font-size:14px; font-weight:600; padding:8px 12px;" />
-            </div>
+
             <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
               <div class="type-btn custom-input-btn" id="type-custom-full" onclick="selectPlanType('custom','full')" style="flex:1; min-width:140px;">
-                <span class="tb-label">🎬 完整製作</span>
+                <span class="tb-label">🎬 完整剪輯</span>
                 <input type="number" id="custom-full-price" placeholder="填入金額" min="0"
                   onclick="event.stopPropagation(); selectPlanType('custom','full')"
                   oninput="updateCustomPrice(); calculate()"
@@ -468,52 +482,40 @@ input::placeholder { color: var(--text-dim); }
     </div>
   </div>
 
-  <!-- Step 3: Client type -->
-  <div class="card">
-    <div class="card-label">STEP 03</div>
-    <div class="card-title"><span class="step-num">3</span>超時費</div>
-    <div class="service-row" style="grid-template-columns:1fr 1fr 1fr;">
-      <div class="service-card active" id="client-regular" onclick="selectClientType('regular')">
-        <div class="service-title">👤 一般客戶</div>
-        <div class="service-desc">超時費 $850 / 分鐘</div>
-      </div>
-      <div class="service-card" id="client-loyal" onclick="selectClientType('loyal')">
-        <div class="service-title">⭐ 熟客</div>
-        <div class="service-desc">超時費 $800 / 分鐘</div>
-      </div>
-      <div class="service-card" id="client-custom" onclick="selectClientType('custom')">
-        <div class="service-title">✏️ 自訂</div>
-        <div class="service-desc">手動填寫超時費</div>
-      </div>
-    </div>
-    <div id="custom-rate-wrap" style="display:none; margin-top:12px;">
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <label style="font-size:12px; color:var(--mid); white-space:nowrap;">超時費單價</label>
-        <div style="display:flex; align-items:center; gap:6px;">
-          <input type="number" id="custom-rate-input" placeholder="例：750" min="0"
-            style="width:110px; font-family:'Space Mono',monospace; font-size:18px; font-weight:700;"
-            oninput="calculate()" />
-          <span style="font-size:13px; color:var(--mid);">元 / 分鐘</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Step 4: Duration -->
   <div class="card">
-    <div class="card-label">STEP 04</div>
-    <div class="card-title"><span class="step-num">4</span>成品時長</div>
-    <div class="duration-wrap">
-      <input class="duration-input" type="number" id="duration" value="10" min="1" oninput="calculate()" />
-      <span class="duration-unit">分鐘</span>
+    <div class="card-label">STEP 02</div>
+    <div class="card-title"><span class="step-num">2</span>成品時長</div>
+    <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:11px; color:var(--text-dim); white-space:nowrap;">底價</span>
+        <input class="duration-input" type="number" id="base-minutes" value="10" min="1" oninput="calculate()"
+          style="width:65px; font-size:18px;" />
+        <span class="duration-unit">分鐘</span>
+      </div>
+      <div style="color:var(--border2); font-size:16px;">·</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:11px; color:var(--text-dim); white-space:nowrap;">成品</span>
+        <input class="duration-input" type="number" id="duration" value="10" min="1" oninput="calculate()"
+          style="width:65px; font-size:18px;" />
+        <span class="duration-unit">分鐘</span>
+      </div>
+      <div style="color:var(--border2); font-size:16px;">·</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:11px; color:var(--text-dim); white-space:nowrap;">超時費</span>
+        <input type="number" id="overtime-rate-input" value="850" min="0"
+          style="width:70px; font-family:'Space Mono',monospace; font-size:18px; font-weight:700; padding:6px 8px;"
+          oninput="calculate()" />
+        <span class="duration-unit">元/分</span>
+      </div>
     </div>
-    <div class="duration-hint" id="overtime-hint"></div>
+    <div class="duration-hint" id="overtime-hint" style="margin-top:10px;"></div>
   </div>
 
   <!-- Step 6: Extra add-ons -->
   <div class="card">
-    <div class="card-label">STEP 06</div>
-    <div class="card-title"><span class="step-num">6</span>額外加價</div>
+    <div class="card-label">STEP 03</div>
+    <div class="card-title"><span class="step-num">3</span>額外加價</div>
     <div class="ad-row" id="extra-addons">
 
       <!-- Raw footage -->
@@ -560,7 +562,7 @@ input::placeholder { color: var(--text-dim); }
         <div style="display:flex;align-items:center;gap:12px;" onclick="event.stopPropagation()">
           <div id="cover-price-wrap" style="display:none; align-items:center; gap:6px;">
             <span style="font-size:13px;color:var(--mid);">NT$</span>
-            <input type="number" id="cover-price-input" placeholder="0" min="0"
+            <input type="number" id="cover-price-input" placeholder="500" value="500" min="0"
               style="width:80px; font-family:'Space Mono',monospace; font-size:15px; font-weight:700; background:transparent; border:none; border-bottom:1.5px solid var(--line); outline:none; color:var(--ink); padding:2px 0; text-align:right;"
               oninput="calculate()" onclick="toggleExtra('cover', true)" />
           </div>
@@ -582,8 +584,11 @@ input::placeholder { color: var(--text-dim); }
   <!-- Schedule -->
   <div class="card">
     <div class="card-label">時程安排</div>
-    <div class="card-title"><span class="step-num">📅</span>製作時程</div>
-    <div style="display:flex; flex-direction:column; gap:10px;">
+    <div class="card-title" onclick="toggleSchedule()" style="cursor:pointer; user-select:none; justify-content:space-between; margin-bottom:0;">
+      <span><span class="step-num">📅</span>製作時程</span>
+      <span id="sched-chevron" style="font-size:11px; color:var(--text-dim);">▼</span>
+    </div>
+    <div id="sched-body" style="display:none; flex-direction:column; gap:10px; margin-top:16px;">
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
         <label style="font-size:12px; color:var(--mid); width:110px; flex-shrink:0; font-weight:600; color:var(--ink);">拿到檔案日期</label>
         <input type="date" id="sched-receive" onchange="calculate()"
@@ -639,7 +644,7 @@ input::placeholder { color: var(--text-dim); }
       <!-- injected -->
     </div>
     <div class="total-line">
-      <span class="t-label">總報價</span>
+      <span style="font-size:11px; color:var(--text-mid); letter-spacing:0.5px; margin-right:10px; white-space:nowrap;">成品時長 <span id="total-duration-label" style="font-family:'Space Mono',monospace; font-weight:700; color:#c4978a;">—</span></span>
       <span class="t-amount" id="total-amount">—</span>
     </div>
   </div>
@@ -657,6 +662,7 @@ const PLANS = {
   A: { name: 'A 方案', full: 6000, post: 5000 },
   B: { name: 'B 方案', full: 7500, post: 6000 },
   C: { name: 'C 方案', full: 9500, post: 8000 },
+  D: { name: 'D Reels', full: 2500, post: 2500 },
   custom: { name: '自訂方案', full: 0, post: 0 },
 };
 const OVERTIME_RATES = { regular: 850, loyal: 800 };
@@ -686,17 +692,19 @@ let state = {
 function selectPlan(p) {
   if (state.plan === p) {
     state.plan = null; state.type = null;
-    ['A','B','C','custom'].forEach(x => {
+    ['A','B','C','D','custom'].forEach(x => {
       document.getElementById('planrow-'+x).classList.remove('active');
       document.querySelectorAll('[id^="type-'+x+'-"]').forEach(el => el.classList.remove('selected'));
     });
     calculate(); return;
   }
   state.plan = p; state.type = null;
-  ['A','B','C','custom'].forEach(x => {
+  ['A','B','C','D','custom'].forEach(x => {
     document.getElementById('planrow-'+x).classList.toggle('active', x===p);
     document.querySelectorAll('[id^="type-'+x+'-"]').forEach(el => el.classList.remove('selected'));
   });
+  // D plan auto-selects full type
+  if (p === 'D') { state.type = 'full'; document.getElementById('type-D-full').classList.add('selected'); }
   calculate();
 }
 
@@ -710,20 +718,19 @@ function selectPlanType(plan, type) {
   calculate();
 }
 
+function updateDPrice() {
+  const p = parseFloat(document.getElementById('D-full-price').value) || 2500;
+  PLANS.D.full = p;
+  PLANS.D.post = p;
+}
+
 function updateCustomPrice() {
-  const cname = document.getElementById('custom-plan-name').value.trim();
-  PLANS.custom.name = cname || '自訂方案';
   PLANS.custom.full = parseFloat(document.getElementById('custom-full-price').value) || 0;
   PLANS.custom.post = parseFloat(document.getElementById('custom-post-price').value) || 0;
 }
 
 // ── Client type ──────────────────────────────────────
-function selectClientType(t) {
-  state.clientType = t;
-  ['regular','loyal','custom'].forEach(x => document.getElementById('client-'+x).classList.toggle('active', x===t));
-  document.getElementById('custom-rate-wrap').style.display = t === 'custom' ? 'block' : 'none';
-  calculate();
-}
+
 
 // ── Project type ─────────────────────────────────────
 function selectProjType(t) {
@@ -798,6 +805,14 @@ function updateMulticamPrice() {
 }
 
 // ── Custom extra items ───────────────────────────────
+function toggleSchedule() {
+  const body = document.getElementById('sched-body');
+  const chev = document.getElementById('sched-chevron');
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'flex' : 'none';
+  chev.textContent = open ? '▲' : '▼';
+}
+
 function addCustomExtra() {
   const id = ++customExtraId;
   state.customExtras.push({ id, name: '', price: 0 });
@@ -848,19 +863,19 @@ function fmt(n) { return 'NT$' + Number(n).toLocaleString('zh-TW'); }
 
 // ── Main calculate ───────────────────────────────────
 function calculate() {
+  const projName = document.getElementById('project-name').value.trim();
   const dur = parseFloat(document.getElementById('duration').value) || 0;
 
-  const OVERTIME_RATE = state.clientType === 'custom'
-    ? (parseFloat(document.getElementById('custom-rate-input').value) || 0)
-    : OVERTIME_RATES[state.clientType];
+  const baseMins = parseFloat(document.getElementById('base-minutes').value) || 10;
+  const OVERTIME_RATE = parseFloat(document.getElementById('overtime-rate-input').value) || 850;
 
   // Overtime hint
   const hint = document.getElementById('overtime-hint');
-  if (dur > 10) {
-    const extra = dur - 10;
-    hint.innerHTML = '超過 10 分鐘 → <span>+' + extra + ' 分鐘 × $' + OVERTIME_RATE.toLocaleString() + ' = +$' + (extra*OVERTIME_RATE).toLocaleString() + '</span>';
+  if (dur > baseMins) {
+    const extra = dur - baseMins;
+    hint.innerHTML = '超過 ' + baseMins + ' 分鐘 → <span>+' + extra + ' 分鐘 × $' + OVERTIME_RATE.toLocaleString() + ' = +$' + (extra*OVERTIME_RATE).toLocaleString() + '</span>';
   } else {
-    hint.innerHTML = '超過 10 分鐘後，每分鐘 ＋ $' + OVERTIME_RATE.toLocaleString();
+    hint.innerHTML = '超過 ' + baseMins + ' 分鐘後，每分鐘 ＋ $' + OVERTIME_RATE.toLocaleString();
   }
 
   // Urgent fee
@@ -908,7 +923,7 @@ function calculate() {
 
   const plan = PLANS[state.plan];
   const base = state.type === 'full' ? plan.full : plan.post;
-  const overtime = Math.max(0, dur - 10) * OVERTIME_RATE;
+  const overtime = Math.max(0, dur - baseMins) * OVERTIME_RATE;
   const adInline = state.adInline ? AD_INLINE : 0;
   const adMid = state.adMid ? AD_MID : 0;
   const footageHours = state.extraFootage ? (parseFloat(document.getElementById('footage-hours').value) || 0) : 0;
@@ -927,38 +942,44 @@ function calculate() {
 
   // Breakdown rows
   const rows = [];
-  rows.push({ label: plan.name + '（' + (state.type==='full'?'完整製作':'純後製') + '）', amt: base, cls: 'highlight' });
-  if (overtime > 0) rows.push({ label: '超時加收（' + (dur-10) + '分鐘 × $' + OVERTIME_RATE.toLocaleString() + '）', amt: overtime, sign: '+' });
-  if (urgentFee > 0) rows.push({ label: '加急費（少' + (urgentThreshold - deliveryDays) + '天 × $' + URGENT_RATE.toLocaleString() + '）', amt: urgentFee, sign: '+' });
+  rows.push({ label: (projName || plan.name) + ' ' + baseMins + 'm（' + (state.type==='full'?'完整剪輯':'純後製') + '）', amt: base, cls: 'highlight' });
   if (adInline) rows.push({ label: '工商置入', amt: adInline, sign: '+' });
   if (adMid) rows.push({ label: '獨立中插工商', amt: adMid, sign: '+' });
+  if (urgentFee > 0) rows.push({ label: '加急費（少' + (urgentThreshold - deliveryDays) + '天 × $' + URGENT_RATE.toLocaleString() + '）', amt: urgentFee, sign: '+' });
   if (footageFee) rows.push({ label: '毛片（' + footageHours + 'hr，' + footageUnits + ' 單位 × $500）', amt: footageFee, sign: '+' });
   if (multicamFee) rows.push({ label: '多機位（' + state.cameraCount + ' 機 × $500）', amt: multicamFee, sign: '+' });
   if (coverFee) rows.push({ label: '封面圖製作', amt: coverFee, sign: '+' });
   state.customExtras.forEach(e => {
     if (e.price > 0) rows.push({ label: e.name || '自訂項目', amt: e.price, sign: '+' });
   });
+  if (overtime > 0) rows.push({ label: '超時加收（' + (dur-baseMins) + 'm × $' + OVERTIME_RATE.toLocaleString() + '）', amt: overtime, sign: '+' });
 
   document.getElementById('breakdown').innerHTML = rows.map(r =>
     '<div class="breakdown-row ' + (r.cls||'') + '"><span>' + r.label + '</span><span class="amt ' + (r.sign?'plus':'') + '">' + (r.sign||'') + fmt(r.amt) + '</span></div>'
   ).join('');
 
   document.getElementById('total-amount').textContent = fmt(total);
+  document.getElementById('total-duration-label').textContent = dur + 'm';
 
   // Quote text
-  const projName = document.getElementById('project-name').value.trim();
-  let quote = projName ? '【' + projName + ' 報價單】\n' : '【剪輯報價】\n';
-  if (deliveryDays !== null) quote += '交件天數：' + deliveryDays + ' 天\n';
-  quote += '・' + plan.name + '（' + dur + 'm）' + (state.type==='post' ? '（純後製）' : '') + '：' + fmt(base) + '\n';
-  if (overtime > 0) quote += '・超時加收（多 ' + (dur - 10) + ' 分鐘）：+' + fmt(overtime) + '\n';
-  if (urgentFee > 0) quote += '・加急費（工作天 ' + deliveryDays + ' 天）：+' + fmt(urgentFee) + '\n';
-  if (adInline) quote += '・工商置入：+' + fmt(AD_INLINE) + '\n';
-  if (adMid) quote += '・獨立中插工商：+' + fmt(AD_MID) + '\n';
-  if (footageFee) quote += '・毛片（' + footageHours + 'hr）：+' + fmt(footageFee) + '\n';
-  if (multicamFee) quote += '・多機位（' + state.cameraCount + '機）：+' + fmt(multicamFee) + '\n';
-  if (coverFee) quote += '・封面圖製作：+' + fmt(coverFee) + '\n';
+  let quote = projName ? '【' + projName + '_報價】\n' : '【剪輯報價】\n';
+  quote += '基本報價' + (state.projType==='ad' ? '（含工商）' : '') + '：' + fmt(base) + ' / ' + baseMins + 'm\n';
+  quote += '超時費：' + fmt(OVERTIME_RATE) + ' / 1m\n';
+  quote += '（成片超過 ' + baseMins + 'm 後加收）\n';
+  quote += '\n';
+  // Extra items
+  const extraLines = [];
+  if (overtime > 0) extraLines.push('超時加收（多 ' + (dur - baseMins) + 'm）：+' + fmt(overtime));
+  if (urgentFee > 0) extraLines.push('加急費（工作天 ' + deliveryDays + '天）：+' + fmt(urgentFee));
+  if (adInline) extraLines.push('工商置入：+' + fmt(AD_INLINE));
+  if (adMid) extraLines.push('獨立中插工商：+' + fmt(AD_MID));
+  if (footageFee) extraLines.push('毛片（' + footageHours + 'hr）：+' + fmt(footageFee));
+  if (multicamFee) extraLines.push('多機位（' + state.cameraCount + '機）：+' + fmt(multicamFee));
+  if (coverFee) extraLines.push('封面圖製作：+' + fmt(coverFee));
+  state.customExtras.forEach(e => { if (e.price > 0) extraLines.push((e.name||'自訂項目') + '：+' + fmt(e.price)); });
+  if (extraLines.length) quote += extraLines.map(l => '・' + l).join('\n') + '\n';
+  quote += '總報價：' + fmt(total) + ' / ' + dur + 'm\n';
   state.customExtras.forEach(e => {
-    if (e.price > 0) quote += '・' + (e.name||'自訂項目') + '：+' + fmt(e.price) + '\n';
   });
   // Schedule
   const schedFields = [
@@ -974,13 +995,12 @@ function calculate() {
     const parts = val.split('-');
     return label + '：' + parseInt(parts[1]) + '/' + parseInt(parts[2]);
   }).filter(Boolean);
-  quote += '\n總計：' + fmt(total);
-  quote += '\n報價以單機拍攝、毛片 1hr 內、成片 10m 為基準\n';
-  quote += '――――――――――\n';
-  quote += '・完整剪輯含剪輯、音樂、音效、ES效果、效果字、CC中文字幕\n';
-  quote += '・成片每超出 1 分鐘，加收 NT$850（不足 1 分鐘以 1 分鐘計）\n';
-  quote += '・若為雙機以上、毛片超過 1hr，或有額外修改／新增項目，將另行加價，詳見方案頁';
 
+  quote += '――――――――――\n';
+  if (state.type === 'full') quote += '・完整剪輯包含剪輯、配樂、音效、ES 效果、效果字及 CC 中文字幕\n';
+  if (state.type === 'post') quote += '・純後製包含修剪、配樂、音效、ES 效果、效果字及 CC 中文字幕\n';
+  quote += '・基本報價包含單機拍攝、毛片 1hr 內\n';
+  quote += '・雙機拍攝、毛片超過 1hr 等情況另行加價\n';
   if (schedLines.length) quote += '\n――――――――――\n【時程安排】\n' + schedLines.map(l => '・' + l).join('\n') + '\n';
 
   document.getElementById('quote-text').textContent = quote;
@@ -988,12 +1008,30 @@ function calculate() {
 
 function copyQuote() {
   const text = document.getElementById('quote-text').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.textContent = 'COPIED ✓';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
-  });
+  const btn = document.getElementById('copy-btn');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'COPIED ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => fallbackCopy(text, btn));
+  } else {
+    fallbackCopy(text, btn);
+  }
+}
+
+function fallbackCopy(text, btn) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  btn.textContent = 'COPIED ✓';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
 }
 
 calculate();
