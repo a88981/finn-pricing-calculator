@@ -632,6 +632,13 @@ input::placeholder { color: var(--text-dim); }
         <input type="date" id="sched-final" onchange="calculate()"
           style="font-size:13px; font-family:'Space Mono',monospace; padding:6px 10px; flex:1; min-width:140px;" />
       </div>
+      <div id="custom-sched-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <button onclick="addCustomSched()"
+        style="width:100%; padding:9px; border:1px dashed var(--border2); background:transparent; cursor:pointer; font-size:12px; color:var(--text-dim); font-family:'Noto Sans TC',sans-serif; transition:all 0.15s;"
+        onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text-dim)'">
+        ＋ 新增時程項目
+      </button>
     </div>
   </div>
 
@@ -805,6 +812,44 @@ function updateMulticamPrice() {
 }
 
 // ── Custom extra items ───────────────────────────────
+let customSchedId = 0;
+let customScheds = [];
+
+function addCustomSched() {
+  const id = ++customSchedId;
+  customScheds.push({ id, label: '', date: '' });
+  renderCustomScheds();
+}
+
+function removeCustomSched(id) {
+  customScheds = customScheds.filter(s => s.id !== id);
+  renderCustomScheds();
+  calculate();
+}
+
+function updateCustomSched(id, field, val) {
+  const s = customScheds.find(x => x.id === id);
+  if (!s) return;
+  s[field] = val;
+  calculate();
+}
+
+function renderCustomScheds() {
+  const container = document.getElementById('custom-sched-list');
+  const dateStyle = "font-size:13px; font-family:'Space Mono',monospace; padding:6px 10px; flex:1; min-width:120px;";
+  container.innerHTML = customScheds.map(s => `
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <input type="text" placeholder="項目名稱" value="${s.label}"
+        oninput="updateCustomSched(${s.id}, 'label', this.value)"
+        style="width:110px; font-size:12px; flex-shrink:0;" />
+      <input type="date" value="${s.date}"
+        onchange="updateCustomSched(${s.id}, 'date', this.value)"
+        style="${dateStyle}" />
+      <button onclick="removeCustomSched(${s.id})"
+        style="border:none; background:transparent; color:var(--danger); cursor:pointer; font-size:15px; padding:2px 4px;">✕</button>
+    </div>`).join('');
+}
+
 function toggleSchedule() {
   const body = document.getElementById('sched-body');
   const chev = document.getElementById('sched-chevron');
@@ -995,6 +1040,12 @@ function calculate() {
     const parts = val.split('-');
     return label + '：' + parseInt(parts[1]) + '/' + parseInt(parts[2]);
   }).filter(Boolean);
+  customScheds.forEach(s => {
+    if (s.label && s.date) {
+      const parts = s.date.split('-');
+      schedLines.push(s.label + '：' + parseInt(parts[1]) + '/' + parseInt(parts[2]));
+    }
+  });
 
   quote += '――――――――――\n';
   if (state.type === 'full') quote += '・完整剪輯包含剪輯、配樂、音效、ES 效果、效果字及 CC 中文字幕\n';
